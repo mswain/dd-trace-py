@@ -22,11 +22,6 @@ cdef inline char* object_as_cstr(object value):
 
 
 cdef class Span:
-    def __dealloc__(self):
-        if self.c_service != NULL: free(self.c_service)
-        if self.c_resource != NULL: free(self.c_resource)
-        if self.c_name != NULL: free(self.c_name)
-        if self.c_span_type != NULL: free(self.c_span_type)
 
     @property
     def trace_id(self):
