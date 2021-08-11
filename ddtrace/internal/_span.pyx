@@ -1,6 +1,6 @@
 # cython: c_string_type=unicode, c_string_encoding=utf8
 
-from cpython cimport PyBytes_Check, PyUnicode_Check
+from cpython cimport PyBytes_Check, PyUnicode_Check, PyUnicode_AsEncodedString
 from cpython.bytearray cimport PyByteArray_Check
 from libc.stdlib cimport free
 
