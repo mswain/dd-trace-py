@@ -25,6 +25,7 @@ exclude = '''
   | \.riot/
   | ddtrace/internal/_encoding.pyx$
   | ddtrace/internal/_rand.pyx$
+  | ddtrace/internal/_span.pyx$
   | ddtrace/profiling/collector/_traceback.pyx$
   | ddtrace/profiling/collector/_threading.pyx$
   | ddtrace/profiling/collector/stack.pyx$
