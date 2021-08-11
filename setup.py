@@ -218,6 +218,12 @@ setup(
                 define_macros=encoding_macros,
             ),
             Cython.Distutils.Extension(
+                "ddtrace.internal._span",
+                ["ddtrace/internal/_span.pyx"],
+                include_dirs=["."],
+                language="c",
+            ),
+            Cython.Distutils.Extension(
                 "ddtrace.profiling.collector.stack",
                 sources=["ddtrace/profiling/collector/stack.pyx"],
                 language="c",
@@ -250,6 +256,7 @@ setup(
             "PY_MICRO_VERSION": sys.version_info.micro,
         },
         force=True,
+        annotate=os.getenv("CYTHON_ANNOTATE") == "1",
     )
     + get_exts_for("wrapt")
     + get_exts_for("psutil"),

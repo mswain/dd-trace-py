@@ -28,6 +28,7 @@ from .ext import http
 from .ext import net
 from .ext import priority
 from .internal import _rand
+from .internal._span import Span as NativeSpan
 from .internal.compat import NumericType
 from .internal.compat import StringIO
 from .internal.compat import ensure_text
@@ -50,22 +51,12 @@ _MetricDictType = Dict[_TagNameType, NumericType]
 log = get_logger(__name__)
 
 
-class Span(object):
+class Span(NativeSpan):
 
     __slots__ = [
         # Public span attributes
-        "service",
-        "name",
-        "resource",
-        "span_id",
-        "trace_id",
-        "parent_id",
         "meta",
-        "error",
         "metrics",
-        "_span_type",
-        "start_ns",
-        "duration_ns",
         "tracer",
         # Sampler attributes
         "sampled",

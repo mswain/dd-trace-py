@@ -1,10 +1,11 @@
 from cpython cimport *
 from cpython.bytearray cimport PyByteArray_Check
 from libc cimport stdint
+from libc.string cimport strlen
 import threading
 
 from ..constants import ORIGIN_KEY
-
+from ._span cimport Span
 
 DEF MSGPACK_ARRAY_LENGTH_PREFIX_SIZE = 5
 
@@ -335,7 +336,7 @@ cdef class MsgpackEncoder(MsgpackEncoderBase):
         cdef int has_meta
         cdef int has_metrics
 
-        has_span_type = <bint> (span.span_type is not None)
+        has_span_type = span.c_span_type != NULL
         has_meta = <bint> (len(span.meta) > 0 or dd_origin is not None)
         has_metrics = <bint> (len(span.metrics) > 0)
 
@@ -346,53 +347,62 @@ cdef class MsgpackEncoder(MsgpackEncoderBase):
         if ret == 0:
             ret = pack_bytes(&self.pk, <char *> b"trace_id", 8)
             if ret != 0: return ret
-            ret = pack_number(&self.pk, span.trace_id)
+            ret = msgpack_pack_unsigned_long_long(&self.pk, span.c_trace_id)
             if ret != 0: return ret
 
             ret = pack_bytes(&self.pk, <char *> b"parent_id", 9)
             if ret != 0: return ret
-            ret = pack_number(&self.pk, span.parent_id)
+            ret = msgpack_pack_unsigned_long_long(&self.pk, span.c_parent_id)
             if ret != 0: return ret
 
             ret = pack_bytes(&self.pk, <char *> b"span_id", 7)
             if ret != 0: return ret
-            ret = pack_number(&self.pk, span.span_id)
+            ret = msgpack_pack_unsigned_long_long(&self.pk, span.c_span_id)
             if ret != 0: return ret
 
             ret = pack_bytes(&self.pk, <char *> b"service", 7)
             if ret != 0: return ret
-            ret = pack_text(&self.pk, span.service)
+            if span.c_service == NULL:
+                ret = msgpack_pack_nil(&self.pk)
+            else:
+                ret = pack_bytes(&self.pk, span.c_service, strlen(span.c_service))
             if ret != 0: return ret
 
             ret = pack_bytes(&self.pk, <char *> b"resource", 8)
             if ret != 0: return ret
-            ret = pack_text(&self.pk, span.resource)
+            if span.c_resource == NULL:
+                ret = msgpack_pack_nil(&self.pk)
+            else:
+                ret = pack_bytes(&self.pk, span.c_resource, strlen(span.c_resource))
             if ret != 0: return ret
 
             ret = pack_bytes(&self.pk, <char *> b"name", 4)
             if ret != 0: return ret
-            ret = pack_text(&self.pk, span.name)
+            if span.c_name == NULL:
+                ret = msgpack_pack_nil(&self.pk)
+            else:
+                ret = pack_bytes(&self.pk, span.c_name, strlen(span.c_name))
             if ret != 0: return ret
 
             ret = pack_bytes(&self.pk, <char *> b"error", 5)
             if ret != 0: return ret
-            ret = msgpack_pack_long(&self.pk, <long> (1 if span.error else 0))
+            ret = msgpack_pack_int(&self.pk, span.c_error)
             if ret != 0: return ret
 
             ret = pack_bytes(&self.pk, <char *> b"start", 5)
             if ret != 0: return ret
-            ret = pack_number(&self.pk, span.start_ns)
+            ret = msgpack_pack_unsigned_long_long(&self.pk, span.c_start_ns)
             if ret != 0: return ret
 
             ret = pack_bytes(&self.pk, <char *> b"duration", 8)
             if ret != 0: return ret
-            ret = pack_number(&self.pk, span.duration_ns)
+            ret = msgpack_pack_unsigned_long_long(&self.pk, span.c_duration_ns)
             if ret != 0: return ret
 
             if has_span_type:
                 ret = pack_bytes(&self.pk, <char *> b"type", 4)
                 if ret != 0: return ret
-                ret = pack_text(&self.pk, span.span_type)
+                ret = pack_bytes(&self.pk, span.c_span_type, strlen(span.c_span_type))
                 if ret != 0: return ret
 
             if has_meta:
