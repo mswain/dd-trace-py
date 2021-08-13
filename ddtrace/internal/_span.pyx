@@ -1,6 +1,6 @@
 # cython: c_string_type=unicode, c_string_encoding=utf8
 
-from cpython cimport PyBytes_Check, PyUnicode_Check, PyUnicode_AsEncodedString
+from cpython cimport *
 from cpython.bytearray cimport PyByteArray_Check
 from libc.stdlib cimport free
 
@@ -93,7 +93,7 @@ cdef class Span:
 
     @property
     def error(self):
-        return self.c_error == 1
+        return <int> self.c_error
 
     @error.setter
     def error(self, object value):
