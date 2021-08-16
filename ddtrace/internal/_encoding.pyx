@@ -268,7 +268,7 @@ cdef class MsgpackEncoderBase(BufferedEncoder):
     cpdef flush(self):
         raise NotImplementedError()
 
-    cdef pack_span(self, object span, object dd_origin):
+    cdef pack_span(self, Span span, object dd_origin):
         raise NotImplementedError()
 
 
@@ -329,7 +329,7 @@ cdef class MsgpackEncoder(MsgpackEncoderBase):
 
         raise TypeError("Unhandled metrics type: %r" % type(metrics))
 
-    cdef pack_span(self, object span, object dd_origin):
+    cdef pack_span(self, Span span, object dd_origin):
         cdef int ret
         cdef Py_ssize_t L
         cdef int has_span_type
